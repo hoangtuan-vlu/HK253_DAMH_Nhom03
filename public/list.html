@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Lịch Họp Đã Đặt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            color: #1e3a8a;
+            font-size: 24px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-edit {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        
+        .btn-edit:hover {
+            background-color: #cbd5e1;
+        }
+        /* Danh sách bảng */
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        
+        th {
+            background-color: #f8fafc;
+            color: #4b5563;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .badge {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .participants-list {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #64748b;
+        }
+        /* Modal Chỉnh Sửa */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #1e3a8a;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #4b5563;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn-cancel {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #e2e8f0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header-section">
+            <h2>Danh Sách Lịch Họp Đã Đặt</h2>
+            <a href="index.html" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Đặt lịch mới
+            </a>
+        </div>
+
+        <table id="meetingsTable">
+            <thead>
+                <tr>
+                    <th>Tên cuộc họp</th>
+                    <th>Phòng họp</th>
+                    <th>Thời gian bắt đầu</th>
+                    <th>Thời gian kết thúc</th>
+                    <th>Người tham gia</th>
+                    <th style="text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="meetingsList">
+                <!-- Dữ liệu sẽ tự động đổ vào đây từ API -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- MODAL CẬP NHẬT LỊCH HỌP -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>Chỉnh sửa thông tin lịch họp</h3>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Tên cuộc họp</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Phòng họp</label>
+                    <select id="editRoom" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Ngày họp</label>
+                    <input type="date" id="editDate" required>
+                </div>
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label>Giờ bắt đầu</label>
+                        <input type="time" id="editStartTime" required>
+                    </div>
+                    <div>
+                        <label>Giờ kết thúc</label>
+                        <input type="time" id="editEndTime" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Mô tả chi tiết</label>
+                    <textarea id="editDescription" rows="3"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal()">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let roomsMap = {}; // Lưu trữ danh sách phòng để hiển thị tên phòng từ ID
+
+        // Chạy khi trang web tải xong
+        document.addEventListener("DOMContentLoaded", async() => {
+            await loadRooms();
+            await loadMeetings();
+        });
+
+        // 1. Tải danh sách phòng để map _id sang tên hiển thị thực tế
+        async function loadRooms() {
+            try {
+                const res = await fetch("/api/rooms");
+                const rooms = await res.json();
+                const editRoomSelect = document.getElementById("editRoom");
+
+                rooms.forEach(r => {
+                    roomsMap[r._id] = r.name;
+                    const opt = document.createElement("option");
+                    opt.value = r._id;
+                    opt.textContent = r.name;
+                    editRoomSelect.appendChild(opt);
+                });
+            } catch (err) {
+                console.error("Lỗi tải phòng", err);
+            }
+        }
+
+        // 2. Gọi API để lấy tất cả cuộc họp đổ lên giao diện
+        async function loadMeetings() {
+            try {
+                const res = await fetch("/api/meetings");
+                const meetings = await res.json();
+                const tbody = document.getElementById("meetingsList");
+                tbody.innerHTML = "";
+
+                if (meetings.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8;">Chưa có lịch họp nào được đặt.</td></tr>`;
+                    return;
+                }
+
+                meetings.forEach(m => {
+                    const tr = document.createElement("tr");
+
+                    // Định dạng hiển thị ngày giờ đẹp mắt
+                    const startLocal = new Date(m.startTime);
+                    const endLocal = new Date(m.endTime);
+
+                    const dateStr = startLocal.toLocaleDateString('vi-VN');
+                    const startStr = startLocal.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const endStr = endLocal.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    tr.innerHTML = `
+                    <td><strong>${m.title}</strong></td>
+                    <td><span class="badge">${roomsMap[m.room] || "Phòng mẫu"}</span></td>
+                    <td>${dateStr} - ${startStr}</td>
+                    <td>${dateStr} - ${endStr}</td>
+                    <td class="participants-list" title="${m.participants.join(', ')}">${m.participants.length > 0 ? m.participants.join(', ') : 'Không có'}</td>
+                    <td style="text-align: center; display: flex; gap: 8px; justify-content: center;">
+                        <button class="btn btn-edit" onclick="openEditModal('${m._id}')">
+                            <i class="fa-solid fa-pen"></i> Sửa
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteMeeting('${m._id}')">
+                            <i class="fa-solid fa-trash"></i> Xóa
+                        </button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                alert("Lỗi không thể tải danh sách lịch họp.");
+            }
+        }
+
+        // 3. Gọi API để Xóa cuộc họp
+        async function deleteMeeting(id) {
+            if (confirm("Bạn có chắc chắn muốn xóa cuộc họp này không?")) {
+                try {
+                    const res = await fetch(`/api/meetings/${id}`, {
+                        method: "DELETE"
+                    });
+                    const result = await res.json();
+                    alert(result.message);
+                    loadMeetings(); // tải lại danh sách sau khi xóa
+                } catch (err) {
+                    alert("Lỗi khi xóa lịch họp");
+                }
+            }
+        }
+
+        // 4. Mở Modal chỉnh sửa
+        async function openEditModal(id) {
+            try {
+                // Lấy danh sách cuộc họp để trích xuất thông tin bản ghi cũ
+                const res = await fetch("/api/meetings");
+                const meetings = await res.json();
+                const meeting = meetings.find(m => m._id === id);
+
+                if (meeting) {
+                    document.getElementById("editId").value = meeting._id;
+                    document.getElementById("editTitle").value = meeting.title;
+                    document.getElementById("editRoom").value = meeting.room;
+                    document.getElementById("editDescription").value = meeting.description || "";
+
+                    // Chuyển đổi định dạng ngày giờ gốc về input form tương ứng
+                    const start = new Date(meeting.startTime);
+                    const end = new Date(meeting.endTime);
+
+                    document.getElementById("editDate").value = start.toISOString().substring(0, 10);
+                    document.getElementById("editStartTime").value = start.toTimeString().substring(0, 5);
+                    document.getElementById("editEndTime").value = end.toTimeString().substring(0, 5);
+
+                    document.getElementById("editModal").style.display = "flex";
+                }
+            } catch (err) {
+                alert("Lỗi không thể lấy dữ liệu lịch họp chi tiết.");
+            }
+        }
+
+        function closeModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+
+        // 5. Lưu thông tin Chỉnh Sửa lên API
+        document.getElementById("editForm").addEventListener("submit", async(e) => {
+            e.preventDefault();
+
+            const id = document.getElementById("editId").value;
+            const title = document.getElementById("editTitle").value;
+            const room = document.getElementById("editRoom").value;
+            const dateVal = document.getElementById("editDate").value;
+            const startVal = document.getElementById("editStartTime").value;
+            const endVal = document.getElementById("editEndTime").value;
+            const description = document.getElementById("editDescription").value;
+
+            // Định dạng lại ngày giờ thành ISO
+            const startTimeISO = new Date(`${dateVal}T${startVal}:00`).toISOString();
+            const endTimeISO = new Date(`${dateVal}T${endVal}:00`).toISOString();
+
+            try {
+                const response = await fetch(`/api/meetings/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        title,
+                        room,
+                        startTime: startTimeISO,
+                        endTime: endTimeISO,
+                        participants: [], // Giữ nguyên hoặc xử lý mảng mời tùy chọn
+                        description
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message);
+                    closeModal();
+                    loadMeetings(); // tải lại danh sách mới
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                alert("Lỗi kết nối máy chủ để cập nhật lịch họp.");
+            }
+        });
+    </script>
+</body>
+
+</html>

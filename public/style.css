@@ -1,0 +1,360 @@
+:root {
+    --primary-color: #1043e6;
+    --text-color: #1a1a1a;
+    --border-color: #cccccc;
+    --bg-light: #f8fafc;
+    --required-color: #ff3b30;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-color);
+}
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* SIDEBAR LAYOUT */
+
+.sidebar {
+    width: 240px;
+    background-color: #ffffff;
+    border-right: 1px solid #edf2f7;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    margin-bottom: 35px;
+}
+
+.brand-icon {
+    font-size: 32px;
+    color: var(--primary-color);
+    margin-right: 12px;
+}
+
+.brand-text h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+}
+
+.brand-text p {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 2px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.menu-item i {
+    margin-right: 14px;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+    color: #4a5568;
+}
+
+.menu-item:hover {
+    background-color: #f1f5f9;
+}
+
+.menu-item.active {
+    background-color: #e0e9ff;
+    color: var(--primary-color);
+    border-right: 4px solid var(--primary-color);
+}
+
+.menu-item.active i {
+    color: var(--primary-color);
+}
+
+
+/* MAIN CONTENT LAYOUT */
+
+.main-content {
+    flex-grow: 1;
+    padding: 40px 50px;
+    background-color: #ffffff;
+    margin: 15px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.form-header {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 15px;
+}
+
+.form-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000000;
+}
+
+.form-header p {
+    font-size: 13px;
+    color: #718096;
+    margin-top: 4px;
+}
+
+
+/* FORM FIELDS STYLE */
+
+.meeting-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 10px);
+}
+
+.form-group.full-width {
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #000000;
+}
+
+.required {
+    color: var(--required-color);
+    margin-left: 2px;
+}
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-color);
+}
+
+
+/* Thêm khoảng trống bên trái cho ô nhập liệu có icon */
+
+.input-wrapper .icon-left {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #718096;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.input-wrapper .icon-left+input,
+.input-wrapper .icon-left+select {
+    padding-left: 42px;
+}
+
+
+/* Nút Thêm Người tham gia kế bên Ô Chọn */
+
+.row-with-btn {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.btn-add-user {
+    padding: 12px 24px;
+    background-color: #ffffff;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.btn-add-user:hover {
+    background-color: #f0f4ff;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tag {
+    background-color: #edf2f7;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tag i {
+    cursor: pointer;
+    color: #a0aec0;
+}
+
+.tag i:hover {
+    color: var(--required-color);
+}
+
+
+/* Hộp Kéo thả Tệp đính kèm */
+
+.upload-box {
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: background-color 0.2s;
+}
+
+.upload-box:hover {
+    background-color: #f7fafc;
+    border-color: var(--primary-color);
+}
+
+.upload-icon {
+    font-size: 28px;
+    color: #4a5568;
+}
+
+.upload-text strong {
+    font-size: 14px;
+    color: #1a202c;
+}
+
+.upload-text p {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 2px;
+}
+
+
+/* Khu vực nút bấm cuối trang */
+
+.form-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.form-actions button {
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color) !important;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background-color: #edf2f7;
+}
+
+.btn-outline {
+    background-color: #ffffff;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background-color: #f0f4ff;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #0b34b7;
+}
+
+#responseMessage {
+    margin-top: 20px;
+    text-align: right;
+    font-weight: bold;
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Lịch Họp Nội Bộ</title>
+    <!-- FontAwesome để vẽ icon thùng rác, dấu x -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #1e3a8a;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #2563eb;
+        }
+        
+        .row-datetime {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+        /* Phần quản lý danh sách người tham gia */
+        
+        .participant-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-add-user {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-add-user:hover {
+            background-color: #059669;
+        }
+        
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            min-height: 45px;
+            background: #f8fafc;
+        }
+        
+        .tag {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .tag i {
+            cursor: pointer;
+            color: #ef4444;
+        }
+        /* Khu vực hiển thị thông báo kết quả */
+        
+        .msg-box {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: none;
+            text-align: center;
+        }
+        
+        .msg-box.success {
+            display: block;
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .msg-box.warning {
+            display: block;
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        
+        .msg-box.error {
+            display: block;
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .msg-box.info {
+            display: block;
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+        /* Khung chứa các nút bấm hành động */
+        
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .btn-check {
+            background-color: #ffffff;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+        }
+        
+        .btn-check:hover {
+            background-color: #eff6ff;
+        }
+        
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Đặt Lịch Họp Nội Bộ</h2>
+
+        <form id="meetingForm">
+            <!-- Tên cuộc họp -->
+            <div class="form-group">
+                <label for="title">Tên cuộc họp <span style="color: red;">*</span></label>
+                <input type="text" id="title" placeholder="Nhập tiêu đề hoặc nội dung cuộc họp..." required>
+            </div>
+
+            <!-- Chọn phòng họp -->
+            <div class="form-group">
+                <label for="room">Chọn phòng họp <span style="color: red;">*</span></label>
+                <select id="room" required>
+                <option value="">-- Chọn phòng họp trống --</option>
+            </select>
+            </div>
+
+            <!-- Ngày và Giờ họp -->
+            <div class="form-group">
+                <label>Thời gian họp <span style="color: red;">*</span></label>
+                <div class="row-datetime">
+                    <div>
+                        <input type="date" id="meetingDate" required>
+                    </div>
+                    <div>
+                        <input type="time" id="startTime" required>
+                    </div>
+                    <div>
+                        <input type="time" id="endTime" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mời người tham gia -->
+            <div class="form-group">
+                <label>Mời người tham gia</label>
+                <div class="participant-container">
+                    <select id="participantsSelect">
+                    <option value="">-- Chọn nhân viên để thêm --</option>
+                    <option value="nguyen.van.a@xyz.com">Nguyễn Văn A (nguyen.van.a@xyz.com)</option>
+                    <option value="tran.thi.b@xyz.com">Trần Thị B (tran.thi.b@xyz.com)</option>
+                    <option value="le.van.c@xyz.com">Lê Văn C (le.van.c@xyz.com)</option>
+                    <option value="pham.thi.d@xyz.com">Phạm Thị D (pham.thi.d@xyz.com)</option>
+                </select>
+                    <button type="button" class="btn-add-user">Thêm</button>
+                </div>
+                <!-- Hiển thị các tag nhân viên được mời -->
+                <div class="tags-container" id="participantsList"></div>
+            </div>
+
+            <!-- Mô tả cuộc họp -->
+            <div class="form-group">
+                <label for="description">Mô tả cuộc họp</label>
+                <textarea id="description" rows="3" placeholder="Nhập nội dung mô tả chi tiết (nếu có)..."></textarea>
+            </div>
+
+            <!-- Hộp thông báo trạng thái kiểm tra/lưu -->
+            <div id="responseMessage" class="msg-box"></div>
+
+            <!-- Các nút chức năng -->
+            <div class="button-group">
+                <a href="list.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                    <i class="fa-solid fa-list"></i> Xem lịch đã đặt
+                </a>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Hủy</button>
+                <button type="button" id="btnCheck" class="btn btn-check">Kiểm tra lịch</button>
+                <button type="submit" class="btn btn-primary">Tạo lịch họp</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Giả lập Tài khoản Người đặt lịch (Organizer)
+        const CURRENT_USER_EMAIL = "tuan.vh@xyz.com";
+        const selectedParticipants = [];
+
+        // 1. Tự động tải danh sách phòng họp từ DB local khi mở trang
+        document.addEventListener("DOMContentLoaded", async() => {
+            try {
+                const res = await fetch("/api/rooms");
+                const rooms = await res.json();
+                const roomSelect = document.getElementById("room");
+
+                // Xóa các option cũ trừ option mặc định đầu tiên
+                roomSelect.innerHTML = '<option value="">-- Chọn phòng họp trống --</option>';
+
+                rooms.forEach(r => {
+                    const opt = document.createElement("option");
+                    opt.value = r._id;
+                    opt.textContent = `${r.name}`;
+                    roomSelect.appendChild(opt);
+                });
+            } catch (err) {
+                showNotification("Không thể tải danh sách phòng họp từ hệ thống backend.", "error");
+            }
+        });
+
+        // 2. Xử lý logic Thêm người tham gia vào danh sách Tags
+        document.querySelector(".btn-add-user").addEventListener("click", () => {
+            const select = document.getElementById("participantsSelect");
+            const email = select.value;
+            if (email && !selectedParticipants.includes(email)) {
+                selectedParticipants.push(email);
+                renderTags();
+                select.value = ""; // reset dropdown chọn người
+            }
+        });
+
+        function renderTags() {
+            const container = document.getElementById("participantsList");
+            container.innerHTML = "";
+            selectedParticipants.forEach((email, index) => {
+                const tag = document.createElement("span");
+                tag.className = "tag";
+                tag.innerHTML = `${email} <i class="fa-solid fa-xmark" onclick="removeTag(${index})"></i>`;
+                container.appendChild(tag);
+            });
+        }
+
+        window.removeTag = (index) => {
+            selectedParticipants.splice(index, 1);
+            renderTags();
+        };
+
+        // Hàm đổi Ngày + Giờ thành định dạng ISO chuẩn gửi lên API
+        function convertToISO(dateId, timeId) {
+            const dateVal = document.getElementById(dateId).value;
+            const timeVal = document.getElementById(timeId).value;
+            if (!dateVal || !timeVal) return null;
+            return new Date(`${dateVal}T${timeVal}:00`).toISOString();
+        }
+
+        // Hàm hiển thị hộp thoại thông báo đa năng
+        function showNotification(text, type) {
+            const msgDiv = document.getElementById("responseMessage");
+            msgDiv.className = `msg-box ${type}`;
+            msgDiv.innerText = text;
+        }
+
+        // 3. XỬ LÝ SỰ KIỆN: NÚT "KIỂM TRA LỊCH"
+        document.getElementById("btnCheck").addEventListener("click", async() => {
+            const roomVal = document.getElementById("room").value;
+            const startTimeISO = convertToISO("meetingDate", "startTime");
+            const endTimeISO = convertToISO("meetingDate", "endTime");
+
+            if (!roomVal || !startTimeISO || !endTimeISO) {
+                showNotification("Vui lòng nhập đầy đủ: Phòng họp, Ngày họp, Giờ bắt đầu và kết thúc trước khi kiểm tra!", "error");
+                return;
+            }
+
+            showNotification("Đang quét dữ liệu kiểm tra trên máy chủ...", "info");
+
+            try {
+                const response = await fetch("/api/meetings/check", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        room: roomVal,
+                        startTime: startTimeISO,
+                        endTime: endTimeISO,
+                        participants: selectedParticipants
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    if (result.status === "available") {
+                        showNotification(result.message, "success");
+                    } else if (result.status === "warning_participants") {
+                        showNotification(result.message, "warning");
+                    } else if (result.status === "conflict_room") {
+                        showNotification(result.message, "error");
+                    }
+                } else {
+                    showNotification(result.message || "Đã xảy ra lỗi hệ thống backend.", "error");
+                }
+            } catch (err) {
+                showNotification("Không thể kết nối đến API kiểm tra của Backend.", "error");
+            }
+        });
+
+        // 4. XỬ LÝ SỰ KIỆN: SUBMIT FORM TẠO LỊCH HỌP
+        document.getElementById("meetingForm").addEventListener("submit", async(e) => {
+            e.preventDefault();
+
+            const startTimeISO = convertToISO("meetingDate", "startTime");
+            const endTimeISO = convertToISO("meetingDate", "endTime");
+
+            if (!startTimeISO || !endTimeISO) {
+                showNotification("Thời gian họp không hợp lệ, vui lòng kiểm tra lại!", "error");
+                return;
+            }
+
+            showNotification("Đang tạo lịch họp trên hệ thống...", "info");
+
+            const formData = {
+                title: document.getElementById("title").value,
+                room: document.getElementById("room").value,
+                startTime: startTimeISO,
+                endTime: endTimeISO,
+                participants: selectedParticipants,
+                description: document.getElementById("description").value,
+                organizer: CURRENT_USER_EMAIL
+            };
+
+            try {
+                const response = await fetch("/api/meetings", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.status === 201) {
+                    let successMsg = result.message;
+                    if (result.warning) {
+                        successMsg += "\n" + result.warning;
+                        showNotification(successMsg, "warning");
+                    } else {
+                        showNotification(successMsg, "success");
+                    }
+
+                    // Đặt lịch thành công thì xóa trắng form để nhập lịch tiếp theo
+                    document.getElementById("meetingForm").reset();
+                    selectedParticipants.length = 0;
+                    renderTags();
+                } else {
+                    showNotification(result.message, "error");
+                }
+            } catch (error) {
+                showNotification("Lỗi kết nối. Không thể lưu dữ liệu lên máy chủ Backend.", "error");
+            }
+        });
+
+        // Hàm dọn dẹp Form (Nút Hủy)
+        function resetForm() {
+            document.getElementById("meetingForm").reset();
+            selectedParticipants.length = 0;
+            renderTags();
+            const msgDiv = document.getElementById("responseMessage");
+            msgDiv.style.display = "none";
+        }
+    </script>
+</body>
+
+</html>
